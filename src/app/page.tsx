@@ -34,6 +34,7 @@ export default function DashboardPage() {
       <div className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-gradient-to-b from-[#08080e] via-[#050508] to-[#030305] p-6 sm:p-8">
         {/* Background radial accretion glow */}
         <div className="absolute top-1/2 right-12 -translate-y-1/2 w-96 h-96 bg-void-gold/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute bottom-0 left-1/3 w-64 h-64 bg-red-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center gap-5">
@@ -171,7 +172,8 @@ export default function DashboardPage() {
               <CardTitle className="text-white font-display text-base font-semibold">Throughput Volumetrics</CardTitle>
               <p className="text-xs text-void-muted mt-0.5">Real-time incoming agent requests/min</p>
             </div>
-            <span className="text-[10px] font-mono text-void-gold bg-void-gold/10 px-2 py-0.5 rounded border border-void-gold/20">
+            <span className="text-[10px] font-mono font-bold text-red-400 bg-red-500/15 px-2.5 py-0.5 rounded-full border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.25)] flex items-center gap-1.5 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
               Live Stream
             </span>
           </CardHeader>
@@ -179,9 +181,9 @@ export default function DashboardPage() {
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={stats.charts.requestsPerMinute}>
                 <defs>
-                  <linearGradient id="goldGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#C9A84C" stopOpacity={0.4}/>
-                    <stop offset="95%" stopColor="#C9A84C" stopOpacity={0}/>
+                  <linearGradient id="redGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.4}/>
+                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#161622" vertical={false} />
@@ -189,9 +191,9 @@ export default function DashboardPage() {
                 <YAxis stroke="#6b7280" fontSize={11} tickLine={false} axisLine={false} />
                 <RechartsTooltip 
                   contentStyle={{ backgroundColor: '#09090e', borderColor: '#232336', borderRadius: '8px', color: '#e6e6e6', fontSize: '12px' }} 
-                  itemStyle={{ color: '#C9A84C' }}
+                  itemStyle={{ color: '#ef4444' }}
                 />
-                <Area type="monotone" dataKey="requests" stroke="#C9A84C" strokeWidth={2} fillOpacity={1} fill="url(#goldGradient)" />
+                <Area type="monotone" dataKey="requests" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#redGradient)" />
               </AreaChart>
             </ResponsiveContainer>
           </CardContent>

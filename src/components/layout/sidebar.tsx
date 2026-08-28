@@ -41,9 +41,9 @@ export function Sidebar() {
             />
           </div>
           {!collapsed && (
-            <div className="flex items-center gap-1.5 overflow-hidden">
-              <span className="font-display font-bold text-base tracking-wider text-void-body">VOID</span>
-              <span className="text-[10px] uppercase font-mono tracking-widest text-void-gold/80 bg-void-gold/10 px-1.5 py-0.5 rounded border border-void-gold/20">
+            <div className="flex flex-col min-w-0 leading-tight">
+              <span className="font-display font-bold text-xs tracking-wider text-white truncate">VOID INTERNATIONAL</span>
+              <span className="text-[9px] font-mono font-semibold tracking-widest text-void-gold bg-void-gold/10 px-1.5 py-0.5 rounded border border-void-gold/20 w-fit mt-0.5">
                 MVP
               </span>
             </div>

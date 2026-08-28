@@ -36,7 +36,8 @@ export default function TracesPage() {
         <div>
           <div className="flex items-center gap-2.5">
             <h1 className="text-2xl font-display font-bold text-white tracking-tight">Request Traces</h1>
-            <span className="text-[10px] font-mono uppercase tracking-widest text-void-gold bg-void-gold/10 px-2 py-0.5 rounded border border-void-gold/20">
+            <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-red-400 bg-red-500/15 px-2.5 py-0.5 rounded-full border border-red-500/30 shadow-[0_0_10px_rgba(239,68,68,0.2)] flex items-center gap-1.5 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-red-500"></span>
               Audit Stream
             </span>
           </div>

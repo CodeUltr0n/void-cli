@@ -104,6 +104,7 @@ export function Header() {
         <div className="hidden md:flex items-center gap-2 px-2.5 py-1 rounded-full bg-white/[0.03] border border-white/[0.06] text-xs">
           <div className="h-1.5 w-1.5 rounded-full bg-void-success animate-pulse"></div>
           <span className="text-void-muted text-[11px] font-mono">Routing Active</span>
+          <span className="text-[9px] font-mono font-bold text-red-400 bg-red-500/15 border border-red-500/30 px-1.5 py-0.2 rounded uppercase">Mesh 100%</span>
         </div>
 
         {/* Command shortcut */}
@@ -128,7 +129,7 @@ export function Header() {
         
         <button className="text-void-muted hover:text-void-body transition-colors relative p-1.5 rounded-md hover:bg-white/[0.04]">
           <Bell className="h-4 w-4" />
-          <span className="absolute top-1 right-1 h-1.5 w-1.5 rounded-full bg-void-gold ring-2 ring-[#050508]"></span>
+          <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-red-500 ring-2 ring-[#050508] shadow-[0_0_8px_rgba(239,68,68,0.8)] animate-pulse"></span>
         </button>
         
         {/* User Avatar */}
