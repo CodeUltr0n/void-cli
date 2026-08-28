@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { getServers, getMetrics, addTrace } from '@/lib/store'
 import { routeRequest } from '@/lib/mcp/router'
 import { HotelHub, SkyRoute, BookEase } from '@/lib/mcp/mock-servers'
-import { subDays } from 'date-fns'
 
 export async function POST(request: Request) {
   try {
@@ -14,15 +13,8 @@ export async function POST(request: Request) {
     }
 
     // Get healthy servers
-    const servers = await db.mCPServer.findMany({
-      where: { status: { not: 'down' } }
-    })
-
-    // Get recent metrics for routing decisions
-    const yesterday = subDays(new Date(), 1)
-    const recentMetrics = await db.serverMetric.findMany({
-      where: { timestamp: { gte: yesterday } }
-    })
+    const servers = getServers().filter(s => s.status !== 'down')
+    const recentMetrics = getMetrics(undefined, 24)
 
     // 1. Run routing engine
     const decision = routeRequest({
@@ -39,20 +31,16 @@ export async function POST(request: Request) {
     let output = null
 
     try {
-      // Map server ID to mock implementation
-      // In a real app this would proxy to the actual MCP endpoint
       let mockServer;
       if (decision.server.name === 'HotelHub Pro') mockServer = HotelHub
-      else if (decision.server.name === 'SkyRoute') mockServer = SkyRoute
+      else if (decision.server.name === 'SkyRoute API' || decision.server.name === 'SkyRoute') mockServer = SkyRoute
       else mockServer = BookEase
 
-      // Find the tool function
       const toolFn = (mockServer as any)[toolName]
       if (toolFn) {
         output = await toolFn({ query })
       } else {
-        // Fallback for tools not perfectly mapped in mock
-        await new Promise(r => setTimeout(r, 200 + Math.random() * 300))
+        await new Promise(r => setTimeout(r, 120 + Math.random() * 80))
         output = { result: "Mock execution successful", tool: toolName }
       }
     } catch (e: any) {
@@ -63,18 +51,17 @@ export async function POST(request: Request) {
     
     const latencyMs = Date.now() - start
 
-    // 3. Record trace in background (don't await to keep response fast)
-    db.requestTrace.create({
-      data: {
-        serverId: decision.server.id,
-        toolName,
-        input: JSON.stringify({ query }),
-        output: JSON.stringify(output),
-        status,
-        latencyMs,
-        routedVia: strategy,
-      }
-    }).catch(console.error)
+    // 3. Record trace in memory store
+    addTrace({
+      serverId: decision.server.id,
+      serverName: decision.server.name,
+      toolName,
+      durationMs: latencyMs,
+      status,
+      requestPayload: JSON.stringify({ query }),
+      responsePayload: JSON.stringify(output),
+      errorMessage,
+    })
 
     return NextResponse.json({
       decision,

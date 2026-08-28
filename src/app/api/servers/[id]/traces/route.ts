@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { db } from '@/lib/db'
+import { getTraces } from '@/lib/store'
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -7,21 +7,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const { searchParams } = new URL(request.url)
     const limit = parseInt(searchParams.get('limit') || '50')
     
-    const traces = await db.requestTrace.findMany({
-      where: {
-        serverId: id,
-      },
-      orderBy: {
-        createdAt: 'desc'
-      },
-      take: limit,
-      include: {
-        server: {
-          select: { name: true, status: true }
-        }
-      }
-    })
-    
+    const traces = getTraces({ serverId: id, limit })
     return NextResponse.json(traces)
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch traces' }, { status: 500 })

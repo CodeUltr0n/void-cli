@@ -1,4 +1,4 @@
-import type { MCPServer, ServerMetric } from '@prisma/client'
+import type { MCPServer, ServerMetric } from '@/lib/store'
 
 export interface RoutingContext {
   toolName: string;

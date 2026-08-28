@@ -1,15 +1,13 @@
 import { NextResponse } from 'next/server'
 import Groq from 'groq-sdk'
-import { db } from '@/lib/db'
+import { getServers, getMetrics, addTrace } from '@/lib/store'
 import { routeRequest } from '@/lib/mcp/router'
 import { HotelHub, SkyRoute, BookEase } from '@/lib/mcp/mock-servers'
-import { subDays } from 'date-fns'
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || 'dummy_key',
 })
 
-// Define the available tools for the agent
 const tools = [
   {
     type: "function" as const,
@@ -61,12 +59,10 @@ export async function POST(request: Request) {
   try {
     const { messages } = await request.json()
     
-    // Check if we should use demo mode
     if (!process.env.GROQ_API_KEY) {
       return handleDemoMode(messages)
     }
 
-    // Try primary and fallback active Groq models
     const candidateModels = [
       process.env.GROQ_MODEL,
       "qwen/qwen3.8-27b",
@@ -78,7 +74,6 @@ export async function POST(request: Request) {
     ].filter(Boolean) as string[]
 
     let response = null
-    let lastError = null
 
     for (const model of candidateModels) {
       try {
@@ -91,7 +86,6 @@ export async function POST(request: Request) {
         })
         if (response) break
       } catch (err: any) {
-        lastError = err
         const isModelError = 
           err?.status === 404 || 
           err?.status === 400 ||
@@ -109,29 +103,23 @@ export async function POST(request: Request) {
     }
 
     if (!response) {
-      // Gracefully fallback to demo mode simulation if no Groq model is reachable
       console.warn("Falling back to demo mode simulation due to Groq model failure")
       return handleDemoMode(messages)
     }
 
     const responseMessage = response.choices[0]?.message
 
-    // If Groq decided to call tools
     if (responseMessage?.tool_calls) {
       const toolCalls = responseMessage.tool_calls
       const traces: any[] = []
       
-      // Get data for routing
-      const servers = await db.mCPServer.findMany({ where: { status: { not: 'down' } } })
-      const yesterday = subDays(new Date(), 1)
-      const recentMetrics = await db.serverMetric.findMany({ where: { timestamp: { gte: yesterday } } })
-      const sessionId = "sess_" + Date.now()
+      const servers = getServers().filter(s => s.status !== 'down')
+      const recentMetrics = getMetrics(undefined, 24)
 
       for (const toolCall of toolCalls) {
         const functionName = toolCall.function.name
         const functionArgs = JSON.parse(toolCall.function.arguments)
         
-        // 1. ROUTE the tool call via Void's engine
         let decision;
         try {
           decision = routeRequest({
@@ -153,7 +141,6 @@ export async function POST(request: Request) {
           continue;
         }
 
-        // 2. EXECUTE the tool call on the selected mock server
         const start = Date.now()
         let status = 'success'
         let errorMessage = null
@@ -162,7 +149,7 @@ export async function POST(request: Request) {
         try {
           let mockServer;
           if (decision.server.name === 'HotelHub Pro') mockServer = HotelHub
-          else if (decision.server.name === 'SkyRoute') mockServer = SkyRoute
+          else if (decision.server.name === 'SkyRoute API' || decision.server.name === 'SkyRoute') mockServer = SkyRoute
           else mockServer = BookEase
 
           const toolFn = (mockServer as any)[functionName]
@@ -180,19 +167,15 @@ export async function POST(request: Request) {
         
         const latencyMs = Date.now() - start
 
-        // 3. RECORD the trace
-        await db.requestTrace.create({
-          data: {
-            serverId: decision.server.id,
-            toolName: functionName,
-            input: JSON.stringify(functionArgs),
-            output: JSON.stringify(output),
-            status,
-            latencyMs,
-            routedVia: decision.strategy,
-            agentSession: sessionId,
-            errorMessage
-          }
+        addTrace({
+          serverId: decision.server.id,
+          serverName: decision.server.name,
+          toolName: functionName,
+          durationMs: latencyMs,
+          status,
+          requestPayload: JSON.stringify(functionArgs),
+          responsePayload: JSON.stringify(output),
+          errorMessage
         })
 
         traces.push({
@@ -207,7 +190,6 @@ export async function POST(request: Request) {
         })
       }
 
-      // Generate a rich natural language response based on tool results
       let finalReply: string | null = null
 
       try {
@@ -231,7 +213,6 @@ export async function POST(request: Request) {
         console.warn("Second turn LLM completion failed, generating heuristic summary:", err)
       }
 
-      // Fallback to high-quality contextual summary if 2nd turn fails
       if (!finalReply) {
         const summaries: string[] = []
         for (const t of traces) {
@@ -259,7 +240,6 @@ export async function POST(request: Request) {
       })
     }
 
-    // Normal text response
     return NextResponse.json({
       type: 'text',
       message: responseMessage
@@ -271,16 +251,14 @@ export async function POST(request: Request) {
   }
 }
 
-// Fallback Demo Mode if no GROQ API KEY
 async function handleDemoMode(messages: any[]) {
-  // Simulate network delay
   await new Promise(r => setTimeout(r, 1000))
   
   const traces = [
     {
       id: "call_demo_1",
       toolName: "search_flights",
-      serverName: "SkyRoute",
+      serverName: "SkyRoute API",
       status: "success",
       latencyMs: 245,
       input: { origin: "DEL", destination: "BOM" },
@@ -308,6 +286,7 @@ async function handleDemoMode(messages: any[]) {
         { id: traces[1].id, type: 'function', function: { name: traces[1].toolName, arguments: JSON.stringify(traces[1].input) } }
       ]
     },
+    finalReply: "Checked flight routes on SkyRoute API (245ms) and found 3 hotels matching your criteria on HotelHub Pro (187ms). Recommended option: Taj Exotica.",
     traces
   })
 }

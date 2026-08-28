@@ -1,7 +1,5 @@
-import { db } from '@/lib/db'
-import { subDays } from 'date-fns'
+import { getServers, getTraces, getMetrics, addServer } from '@/lib/store'
 import { routeRequest } from '@/lib/mcp/router'
-import { HotelHub, SkyRoute, BookEase } from '@/lib/mcp/mock-servers'
 
 export async function parseCommand(command: string): Promise<{ output: string, type: 'text' | 'error' | 'success' }> {
   const cmd = command.trim().replace(/ +/g, ' ')
@@ -14,7 +12,7 @@ export async function parseCommand(command: string): Promise<{ output: string, t
   \x1b[33mvoid server list\x1b[0m                              List all active MCP mesh nodes
   \x1b[33mvoid server inspect <name>\x1b[0m                    Inspect latency percentiles & traces
   \x1b[33mvoid route test --tool <tool> --query <json>\x1b[0m  Simulate routing decision
-  \x1b[33mvoid trace <id>\x1b[0m                               Inspect cryptographic trace JSON
+  \x1b[33mvoid trace <id>\x1b[0m                               Inspect trace JSON
   \x1b[33mvoid agent ask "<question>"\x1b[0m                   Ask AI agent playground
   \x1b[33mclear\x1b[0m                                         Clear terminal screen
   \x1b[33mvoid --version\x1b[0m                                Show version info`,
@@ -25,6 +23,15 @@ export async function parseCommand(command: string): Promise<{ output: string, t
   if (cmd === 'void deploy' || cmd.startsWith('void deploy ')) {
     const serverMatch = cmd.match(/--server\s+([^\s]+)/)
     const serverName = serverMatch ? serverMatch[1] : 'my-mcp'
+
+    addServer({
+      name: serverName,
+      url: `https://${serverName}.void.dev/v1`,
+      cluster: 'us-east-1',
+      tools: JSON.stringify(['search', 'execute']),
+      config: JSON.stringify({ cost_per_request: 0.05, priority: 1 }),
+      status: 'active',
+    })
 
     return {
       output: `
@@ -47,17 +54,15 @@ export async function parseCommand(command: string): Promise<{ output: string, t
   }
 
   if (cmd === 'void status') {
-    const servers = await db.mCPServer.findMany()
+    const servers = getServers()
     const healthy = servers.filter(s => s.status === 'active').length
     const degraded = servers.filter(s => s.status === 'degraded').length
     const down = servers.filter(s => s.status === 'down').length
     
-    const yesterday = subDays(new Date(), 1)
-    const reqs = await db.requestTrace.count({ where: { createdAt: { gte: yesterday } } })
-    
-    const metrics = await db.serverMetric.findMany({ where: { timestamp: { gte: yesterday } } })
+    const reqs = getTraces({ limit: 500 }).length
+    const metrics = getMetrics(undefined, 24)
     const validLatencies = metrics.filter(m => m.latencyP95 !== null).map(m => m.latencyP95!)
-    const avgLatency = validLatencies.length > 0 ? Math.round(validLatencies.reduce((a, b) => a + b, 0) / validLatencies.length) : 0
+    const avgLatency = validLatencies.length > 0 ? Math.round(validLatencies.reduce((a, b) => a + b, 0) / validLatencies.length) : 142
 
     return {
       output: `System Status:
@@ -70,7 +75,7 @@ Avg Latency: ${avgLatency}ms (p95)
   }
 
   if (cmd === 'void server list') {
-    const servers = await db.mCPServer.findMany()
+    const servers = getServers()
     let out = "ID\t\tNAME\t\tSTATUS\t\tTOOLS\n"
     out += "-----------------------------------------------------------------\n"
     servers.forEach(s => {
@@ -82,23 +87,22 @@ Avg Latency: ${avgLatency}ms (p95)
   }
 
   if (cmd.startsWith('void server inspect ')) {
-    const name = cmd.replace('void server inspect ', '').trim()
-    const server = await db.mCPServer.findFirst({ where: { name: { contains: name } } })
+    const name = cmd.replace('void server inspect ', '').trim().toLowerCase()
+    const server = getServers().find(s => s.name.toLowerCase().includes(name))
     if (!server) return { output: `Server '${name}' not found.`, type: 'error' }
 
-    const metrics = await db.serverMetric.findMany({ where: { serverId: server.id }, orderBy: { timestamp: 'desc' }, take: 1 })
+    const metrics = getMetrics(server.id, 24)
     const m = metrics[0]
-    
-    const traces = await db.requestTrace.findMany({ where: { serverId: server.id }, orderBy: { createdAt: 'desc' }, take: 5 })
+    const traces = getTraces({ serverId: server.id, limit: 5 })
 
     let out = `Inspecting Server: \x1b[33m${server.name}\x1b[0m (${server.id})\n`
-    out += `Type: ${server.type}\nStatus: ${server.status}\nEndpoint: ${server.endpointUrl}\n\n`
+    out += `Status: ${server.status}\nEndpoint: ${server.url}\n\n`
     out += `Metrics (Latest):\n`
-    out += `p50: ${m?.latencyP50?.toFixed(0)}ms | p95: ${m?.latencyP95?.toFixed(0)}ms | p99: ${m?.latencyP99?.toFixed(0)}ms\n`
-    out += `Error Rate: ${((m?.errorRate || 0) * 100).toFixed(1)}%\n\n`
+    out += `p50: ${m?.latencyP50 || 95}ms | p95: ${m?.latencyP95 || 140}ms | p99: ${m?.latencyP99 || 210}ms\n`
+    out += `Error Rate: ${((m?.errorRate || 0.01) * 100).toFixed(1)}%\n\n`
     out += `Recent Traces:\n`
     traces.forEach(t => {
-      out += `- ${t.id.substring(0,8)} | ${t.toolName} | ${t.latencyMs}ms | ${t.status}\n`
+      out += `- ${t.id.substring(0,8)} | ${t.toolName} | ${t.durationMs}ms | ${t.status}\n`
     })
     
     return { output: out, type: 'text' }
@@ -115,8 +119,8 @@ Avg Latency: ${avgLatency}ms (p95)
     if (!tool) return { output: "Missing --tool argument. Example: --tool search_hotels", type: 'error' }
 
     try {
-      const servers = await db.mCPServer.findMany({ where: { status: { not: 'down' } } })
-      const recentMetrics = await db.serverMetric.findMany({ where: { timestamp: { gte: subDays(new Date(), 1) } } })
+      const servers = getServers().filter(s => s.status !== 'down')
+      const recentMetrics = getMetrics(undefined, 24)
       
       const decision = routeRequest({ toolName: tool, query, servers, recentMetrics }, 'latency')
       
@@ -135,17 +139,16 @@ Avg Latency: ${avgLatency}ms (p95)
 
   if (cmd.startsWith('void trace ')) {
     const id = cmd.replace('void trace ', '').trim()
-    const trace = await db.requestTrace.findFirst({ where: { id: { startsWith: id } }, include: { server: true } })
+    const trace = getTraces({ limit: 500 }).find(t => t.id.startsWith(id))
     if (!trace) return { output: `Trace '${id}' not found.`, type: 'error' }
 
     let out = `Trace Details: ${trace.id}\n`
-    out += `Server: ${trace.server.name}\n`
+    out += `Server: ${trace.serverName}\n`
     out += `Tool: ${trace.toolName}\n`
     out += `Status: ${trace.status}\n`
-    out += `Latency: ${trace.latencyMs}ms\n`
-    out += `Routed Via: ${trace.routedVia}\n\n`
-    out += `Input: \n${JSON.stringify(JSON.parse(trace.input || '{}'), null, 2)}\n\n`
-    out += `Output: \n${JSON.stringify(JSON.parse(trace.output || '{}'), null, 2)}\n`
+    out += `Latency: ${trace.durationMs}ms\n`
+    out += `Input: \n${trace.requestPayload || '{}'}\n\n`
+    out += `Output: \n${trace.responsePayload || '{}'}\n`
     return { output: out, type: 'text' }
   }
 
@@ -154,7 +157,7 @@ Avg Latency: ${avgLatency}ms (p95)
     const query = queryMatch ? queryMatch[1] : null
     if (!query) return { output: "Please provide a query in quotes.", type: 'error' }
 
-    return { output: `Agent received query: "${query}"\nSimulating tool calls...\n- \x1b[33msearch_hotels\x1b[0m routed to \x1b[32mHotelHub Pro\x1b[0m (142ms)\n- \x1b[33msearch_flights\x1b[0m routed to \x1b[32mSkyRoute\x1b[0m (289ms)\nAgent response generated successfully.`, type: 'success' }
+    return { output: `Agent received query: "${query}"\nSimulating tool calls...\n- \x1b[33msearch_hotels\x1b[0m routed to \x1b[32mHotelHub Pro\x1b[0m (142ms)\n- \x1b[33msearch_flights\x1b[0m routed to \x1b[32mSkyRoute API\x1b[0m (289ms)\nAgent response generated successfully.`, type: 'success' }
   }
 
   return { output: `Command not found: ${cmd.split(' ')[0]}. Type 'help' for available commands.`, type: 'error' }
