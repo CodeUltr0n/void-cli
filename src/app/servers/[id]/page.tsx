@@ -91,7 +91,7 @@ export default function ServerDetailPage() {
               </div>
               <div>
                 <label className="text-xs text-void-muted uppercase font-semibold">Created</label>
-                <div className="text-sm font-medium mt-1">{format(new Date(server.createdAt), 'MMM d, yyyy')}</div>
+                <div className="text-sm font-medium mt-1">{format(new Date(server.createdAt || Date.now()), 'MMM d, yyyy')}</div>
               </div>
               <div>
                 <label className="text-xs text-void-muted uppercase font-semibold">Cost/Req</label>
@@ -181,7 +181,7 @@ export default function ServerDetailPage() {
                   <tr key={trace.id} className="border-b border-void-border hover:bg-white/5 transition-colors cursor-pointer" onClick={() => window.location.href = `/traces`}>
                     <td className="px-4 py-3 font-mono text-void-muted text-xs">{trace.id.substring(0,8)}</td>
                     <td className="px-4 py-3 font-mono text-void-body">{trace.toolName}</td>
-                    <td className="px-4 py-3 font-mono">{trace.latencyMs}ms</td>
+                    <td className="px-4 py-3 font-mono">{trace.durationMs ?? trace.latencyMs ?? 0}ms</td>
                     <td className="px-4 py-3">
                       <Badge variant="outline" className={
                         trace.status === 'success' ? 'border-void-success text-void-success' : 
@@ -191,7 +191,7 @@ export default function ServerDetailPage() {
                       </Badge>
                     </td>
                     <td className="px-4 py-3 text-right text-void-muted">
-                      {format(new Date(trace.createdAt), 'MMM d, HH:mm:ss')}
+                      {format(new Date(trace.timestamp || trace.createdAt || Date.now()), 'MMM d, HH:mm:ss')}
                     </td>
                   </tr>
                 ))}

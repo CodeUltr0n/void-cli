@@ -117,7 +117,7 @@ export default function TracesPage() {
                       {trace.id.substring(0,12)}...
                     </td>
                     <td className="px-6 py-4 text-void-muted font-mono text-[11px] whitespace-nowrap">
-                      {format(new Date(trace.createdAt), 'MMM d, HH:mm:ss')}
+                      {format(new Date(trace.timestamp || trace.createdAt || Date.now()), 'MMM d, HH:mm:ss')}
                     </td>
                     <td className="px-6 py-4 font-mono text-white font-medium">
                       {trace.toolName}
@@ -125,7 +125,7 @@ export default function TracesPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2 text-void-muted group-hover:text-white transition-colors">
                         <Server className="h-3 w-3 text-void-gold" />
-                        {trace.server?.name || "Unknown Target"}
+                        {trace.serverName || trace.server?.name || "Unknown Target"}
                       </div>
                     </td>
                     <td className="px-6 py-4">
@@ -154,7 +154,7 @@ export default function TracesPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-right font-mono font-medium text-white">
-                      {trace.latencyMs}ms
+                      {trace.durationMs ?? trace.latencyMs ?? 0}ms
                     </td>
                   </tr>
                   
@@ -166,7 +166,14 @@ export default function TracesPage() {
                             <h4 className="text-[10px] uppercase font-mono font-semibold text-void-muted mb-2 tracking-wider">Input Payload</h4>
                             <div className="bg-[#07070b] rounded-lg p-3 border border-white/[0.06] h-44 overflow-y-auto">
                               <pre className="text-[11px] font-mono text-[#93c5fd]">
-                                {JSON.stringify(JSON.parse(trace.input || '{}'), null, 2)}
+                                {(() => {
+                                  try {
+                                    const raw = trace.requestPayload || trace.input || '{}'
+                                    return JSON.stringify(typeof raw === 'string' ? JSON.parse(raw) : raw, null, 2)
+                                  } catch {
+                                    return String(trace.requestPayload || trace.input || '{}')
+                                  }
+                                })()}
                               </pre>
                             </div>
                           </div>
@@ -176,7 +183,14 @@ export default function TracesPage() {
                               <pre className={`text-[11px] font-mono ${trace.status === 'success' ? 'text-[#86efac]' : 'text-[#fca5a5]'}`}>
                                 {trace.errorMessage ? 
                                   JSON.stringify({ error: trace.errorMessage }, null, 2) : 
-                                  JSON.stringify(JSON.parse(trace.output || '{}'), null, 2)
+                                  (() => {
+                                    try {
+                                      const raw = trace.responsePayload || trace.output || '{}'
+                                      return JSON.stringify(typeof raw === 'string' ? JSON.parse(raw) : raw, null, 2)
+                                    } catch {
+                                      return String(trace.responsePayload || trace.output || '{}')
+                                    }
+                                  })()
                                 }
                               </pre>
                             </div>
