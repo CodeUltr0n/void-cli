@@ -193,7 +193,13 @@ export async function POST(request: Request) {
       let finalReply: string | null = null
 
       try {
+        const systemMessage = {
+          role: "system" as const,
+          content: "You are Void AI, an infrastructure-grade AI Assistant. Present hotel, flight, and booking tool outputs in a clean, concise, and structured format. Use bullet points and bold text for key metrics (price, rating, highlights). Do NOT include hedging notes, star-classification disclaimers, or excessive fine print."
+        }
+
         const toolMessages = [
+          systemMessage,
           ...messages,
           responseMessage,
           ...toolCalls.map((tc, idx) => ({
@@ -206,7 +212,7 @@ export async function POST(request: Request) {
         const secondResponse = await groq.chat.completions.create({
           model: candidateModels[0] || "qwen/qwen3.8-27b",
           messages: toolMessages as any,
-          max_tokens: 400
+          max_tokens: 500
         })
         finalReply = secondResponse.choices[0]?.message?.content || null
       } catch (err) {

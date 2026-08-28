@@ -67,6 +67,7 @@ export function Sidebar() {
               <Link
                 key={item.name}
                 href={item.href}
+                onClick={() => window.dispatchEvent(new CustomEvent('close-terminal'))}
                 className={cn(
                   "group relative flex items-center gap-x-3 rounded-lg px-2.5 py-2 text-xs font-medium tracking-wide transition-all duration-200",
                   isActive

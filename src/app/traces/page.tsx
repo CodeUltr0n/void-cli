@@ -42,7 +42,7 @@ export default function TracesPage() {
             </span>
           </div>
           <p className="text-xs text-void-muted mt-1">
-            Complete cryptographic execution logs of all tool calls routed through the Void mesh.
+            Full execution trace logging of all tool calls routed through the Void mesh.
           </p>
         </div>
       </div>

@@ -40,7 +40,7 @@ export default function ArchitecturePage() {
       num: "05",
       title: "Enterprise Guardrails",
       tech: "Kong API Gateway",
-      desc: "SOC2-ready security with fine-grained API key scoping, rate limiting, and auditable cryptographic traces.",
+      desc: "SOC2-ready security with fine-grained API key scoping, rate limiting, and complete execution audit trails.",
       icon: Shield,
       implemented: false
     },
@@ -157,7 +157,7 @@ export default function ArchitecturePage() {
             <Shield className="h-3.5 w-3.5 text-void-gold" />
             SOC2 Compliance
           </div>
-          <p className="text-[11px] text-void-muted">Auditable cryptographic traces and policy-driven sandbox isolation.</p>
+          <p className="text-[11px] text-void-muted">Complete execution audit trails and policy-driven sandbox isolation.</p>
         </div>
       </div>
     </div>

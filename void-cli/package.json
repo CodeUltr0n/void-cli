@@ -5,6 +5,12 @@
   "bin": {
     "void": "./index.js"
   },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node index.js --help",
+    "build": "echo 'CLI is zero-build vanilla Node.js script. Run node index.js or npx .'",
+    "test": "node index.js status"
+  },
   "keywords": ["mcp", "ai", "agents", "cli", "void", "infrastructure"],
   "author": "Ketan Chokkara <chokkaraketanrao@gmail.com>",
   "license": "MIT",

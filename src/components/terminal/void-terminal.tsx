@@ -32,7 +32,7 @@ export function VoidTerminal() {
     'void --version'
   ]
 
-  // Global toggle listener
+  // Global toggle and close listener
   useEffect(() => {
     const handleToggle = () => {
       setIsOpen(prev => {
@@ -47,18 +47,29 @@ export function VoidTerminal() {
         return next
       })
     }
-    window.addEventListener('toggle-terminal', handleToggle)
 
-    const handleEscape = (e: KeyboardEvent) => {
+    const handleClose = () => {
+      setIsOpen(false)
+    }
+
+    window.addEventListener('toggle-terminal', handleToggle)
+    window.addEventListener('close-terminal', handleClose)
+
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && isOpen) {
         setIsOpen(false)
       }
+      if (e.key === '`' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) {
+        e.preventDefault()
+        handleToggle()
+      }
     }
-    window.addEventListener('keydown', handleEscape)
+    window.addEventListener('keydown', handleKeyDown)
 
     return () => {
       window.removeEventListener('toggle-terminal', handleToggle)
-      window.removeEventListener('keydown', handleEscape)
+      window.removeEventListener('close-terminal', handleClose)
+      window.removeEventListener('keydown', handleKeyDown)
     }
   }, [isOpen])
 
@@ -257,11 +268,12 @@ export function VoidTerminal() {
   return (
     <div 
       className={`absolute bottom-0 right-0 z-50 select-none bg-[#050508] border-t border-l border-white/[0.12] shadow-[0_-15px_50px_rgba(0,0,0,0.95)] ${
-        isOpen ? 'translate-y-0' : 'translate-y-full pointer-events-none'
+        isOpen ? 'translate-y-0' : 'hidden translate-y-full pointer-events-none'
       } ${
         customWidth ? '' : 'left-0'
       }`}
       style={{ 
+        display: isOpen ? 'block' : 'none',
         height: isMinimized ? '38px' : `${height}px`,
         width: customWidth ? `${customWidth}px` : '100%',
         transition: isDragging 
