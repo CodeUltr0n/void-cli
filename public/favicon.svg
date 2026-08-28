@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <!-- Background Glow -->
+    <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.3"/>
+      <stop offset="60%" stop-color="#08080E" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#030305" stop-opacity="1"/>
+    </radialGradient>
+
+    <!-- Accretion Ring Gradient -->
+    <linearGradient id="ringGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF7B38"/>
+      <stop offset="35%" stop-color="#FCE588"/>
+      <stop offset="70%" stop-color="#C9A84C"/>
+      <stop offset="100%" stop-color="#8B7432"/>
+    </linearGradient>
+
+    <!-- Lensing Arch Gradient -->
+    <linearGradient id="lensGlow" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#C9A84C"/>
+      <stop offset="50%" stop-color="#FFF5D6"/>
+      <stop offset="100%" stop-color="#FF6B2B"/>
+    </linearGradient>
+
+    <filter id="glowBlur" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Background Container -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGlow)"/>
+
+  <!-- Outer Accretion Disk Ellipse -->
+  <ellipse cx="256" cy="265" rx="205" ry="50" fill="none" stroke="url(#ringGlow)" stroke-width="16" filter="url(#glowBlur)" opacity="0.95" transform="rotate(-4 256 265)"/>
+
+  <!-- Gravitational Lensing Arch (Upper Distortion) -->
+  <path d="M 85 260 C 85 130, 427 130, 427 260 C 405 165, 107 165, 85 260 Z" fill="url(#lensGlow)" opacity="0.98" filter="url(#glowBlur)"/>
+
+  <!-- Gravitational Lensing Arch (Lower Sub-Arc) -->
+  <path d="M 155 275 C 155 345, 357 345, 357 275 C 338 322, 174 322, 155 275 Z" fill="url(#ringGlow)" opacity="0.9"/>
+
+  <!-- Inner Accretion Bright Halo Ring -->
+  <ellipse cx="256" cy="256" rx="112" ry="72" fill="none" stroke="url(#lensGlow)" stroke-width="10" filter="url(#glowBlur)"/>
+
+  <!-- Event Horizon (The Black Hole Void) -->
+  <ellipse cx="256" cy="256" rx="92" ry="56" fill="#030305" stroke="#000000" stroke-width="4"/>
+</svg>

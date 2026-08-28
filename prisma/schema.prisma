@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model MCPServer {
+  id          String         @id @default(cuid())
+  name        String
+  description String?
+  type        String         @default("mcp")
+  endpointUrl String
+  status      String         @default("active")
+  tools       String         @default("[]") // JSON string of tool names
+  config      String         @default("{}") // JSON string for server config
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  traces      RequestTrace[]
+  metrics     ServerMetric[]
+}
+
+model RequestTrace {
+  id           String    @id @default(cuid())
+  serverId     String
+  server       MCPServer @relation(fields: [serverId], references: [id])
+  toolName     String
+  input        String    @default("{}")
+  output       String    @default("{}")
+  status       String    @default("success")
+  latencyMs    Int
+  routedVia    String?
+  agentSession String?
+  createdAt    DateTime  @default(now())
+  errorMessage String?
+}
+
+model ServerMetric {
+  id         String    @id @default(cuid())
+  serverId   String
+  server     MCPServer @relation(fields: [serverId], references: [id])
+  timestamp  DateTime  @default(now())
+  latencyP50 Float?
+  latencyP95 Float?
+  latencyP99 Float?
+  errorRate  Float?
+  throughput Float?
+  uptime     Float?
+}

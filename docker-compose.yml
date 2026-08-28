@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  void-dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: void-control-plane
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:./prisma/dev.db
+      - GROQ_API_KEY=${GROQ_API_KEY}
+    volumes:
+      - void-data:/app/prisma
+
+volumes:
+  void-data:

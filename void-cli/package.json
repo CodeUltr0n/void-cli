@@ -1,0 +1,18 @@
+{
+  "name": "@ketan_chokkara/void-cli",
+  "version": "0.1.0-beta",
+  "description": "CLI for Void — The Infrastructure Layer for MCP",
+  "bin": {
+    "void": "./index.js"
+  },
+  "keywords": ["mcp", "ai", "agents", "cli", "void", "infrastructure"],
+  "author": "Ketan Chokkara <chokkaraketanrao@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CodeUltr0n/void"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
