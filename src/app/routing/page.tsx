@@ -111,22 +111,52 @@ export default function RoutingPage() {
                 <div className="flex justify-between w-full max-w-md gap-3 relative z-10">
                   {['HotelHub Pro', 'SkyRoute API', 'BookEase Hub'].map((name, i) => {
                     const isWinner = result?.decision?.server?.name === name || result?.decision?.server?.name?.includes(name.split(' ')[0])
+                    const isDegraded = i === 1 || result?.decision?.server?.status === 'degraded'
+
+                    let cardStyle = "bg-[#09090e]/90 border border-white/[0.06] opacity-60"
+                    let iconStyle = "text-void-muted"
+
+                    if (isWinner) {
+                      if (isDegraded) {
+                        cardStyle = "border-2 border-void-warning bg-gradient-to-b from-void-warning/[0.15] to-[#09090e] shadow-[0_0_30px_rgba(245,158,11,0.45)] scale-105 ring-2 ring-void-warning/60"
+                        iconStyle = "text-void-warning drop-shadow-[0_0_10px_rgba(245,158,11,0.9)]"
+                      } else {
+                        cardStyle = "border-2 border-void-success bg-gradient-to-b from-void-success/[0.15] to-[#09090e] shadow-[0_0_30px_rgba(74,222,128,0.4)] scale-105 ring-2 ring-void-success/60"
+                        iconStyle = "text-void-success drop-shadow-[0_0_10px_rgba(74,222,128,0.9)]"
+                      }
+                    } else if (isDegraded) {
+                      cardStyle = "bg-[#09090e]/90 border border-void-warning/30 shadow-[0_0_12px_rgba(245,158,11,0.12)] opacity-85"
+                      iconStyle = "text-void-warning/80"
+                    }
+
                     return (
                       <div 
                         key={name} 
-                        className={`flex-1 bg-[#09090e]/90 border rounded-xl p-3.5 text-center transition-all duration-300 ${
-                          isWinner 
-                            ? 'border-void-success bg-void-success/[0.08] shadow-[0_0_25px_rgba(74,222,128,0.3)] scale-105 ring-1 ring-void-success/40' 
-                            : 'border-white/[0.06] opacity-60'
-                        }`}
+                        className={`flex-1 rounded-xl p-3.5 text-center transition-all duration-300 relative ${cardStyle}`}
                       >
+                        {isWinner && (
+                          <span className={`absolute -top-3.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider z-20 whitespace-nowrap animate-pulse ${
+                            isDegraded 
+                              ? 'bg-void-warning text-black shadow-[0_0_12px_#f59e0b]' 
+                              : 'bg-void-success text-black shadow-[0_0_12px_#4ade80]'
+                          }`}>
+                            ROUTE WON
+                          </span>
+                        )}
                         <div className="flex justify-center mb-1.5">
-                          <Server className={`h-4 w-4 ${isWinner ? 'text-void-success drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'text-void-muted'}`} />
+                          <Server className={`h-4 w-4 ${iconStyle}`} />
                         </div>
                         <div className="font-semibold text-white text-xs truncate">{name}</div>
                         <div className="flex items-center justify-center gap-1.5 mt-1.5">
-                          <div className={`w-1.5 h-1.5 rounded-full ${i === 1 ? 'bg-void-warning' : 'bg-void-success'}`}></div>
-                          <span className="text-[10px] font-mono text-void-muted capitalize">{i === 1 ? 'Degraded' : 'Active'}</span>
+                          <div className={`relative flex h-2 w-2 items-center justify-center`}>
+                            {i === 1 && (
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-void-warning opacity-75"></span>
+                            )}
+                            <span className={`h-1.5 w-1.5 rounded-full ${i === 1 ? 'bg-void-warning' : 'bg-void-success'}`} />
+                          </div>
+                          <span className={`text-[10px] font-mono capitalize ${i === 1 ? 'text-void-warning font-medium' : 'text-void-muted'}`}>
+                            {i === 1 ? 'Degraded' : 'Active'}
+                          </span>
                         </div>
                       </div>
                     )
@@ -134,20 +164,33 @@ export default function RoutingPage() {
                 </div>
 
                 {/* Arrow to Response */}
-                {result && (
-                  <>
-                    <div className="h-10 w-px bg-void-success my-1 relative animate-pulse shadow-[0_0_8px_#4ade80]"></div>
-                    <div className="w-72 bg-[#09090e]/90 border border-void-success/40 rounded-xl p-3.5 text-center shadow-[0_0_25px_rgba(74,222,128,0.15)] relative z-10 animate-in fade-in zoom-in-95 duration-300">
-                      <div className="flex items-center justify-center gap-1.5 text-xs font-semibold text-void-success">
-                        <CheckCircle2 className="h-3.5 w-3.5" />
-                        Response Delivered
+                {result && (() => {
+                  const isDegradedWinner = result?.decision?.server?.status === 'degraded' || result?.decision?.server?.name?.toLowerCase().includes('skyroute')
+                  return (
+                    <>
+                      <div className={`h-10 w-px my-1 relative animate-pulse ${
+                        isDegradedWinner 
+                          ? 'bg-void-warning shadow-[0_0_10px_#f59e0b]' 
+                          : 'bg-void-success shadow-[0_0_10px_#4ade80]'
+                      }`}></div>
+                      <div className={`w-72 bg-[#09090e]/95 border-2 rounded-xl p-3.5 text-center relative z-10 animate-in fade-in zoom-in-95 duration-300 ${
+                        isDegradedWinner 
+                          ? 'border-void-warning/60 shadow-[0_0_30px_rgba(245,158,11,0.25)]' 
+                          : 'border-void-success/60 shadow-[0_0_30px_rgba(74,222,128,0.2)]'
+                      }`}>
+                        <div className={`flex items-center justify-center gap-1.5 text-xs font-semibold ${
+                          isDegradedWinner ? 'text-void-warning' : 'text-void-success'
+                        }`}>
+                          <CheckCircle2 className="h-3.5 w-3.5" />
+                          Response Delivered {isDegradedWinner ? '(Degraded Route)' : ''}
+                        </div>
+                        <div className="text-[11px] text-white font-mono mt-1">
+                          Execution Latency: <span className="text-void-gold font-bold">{result.execution.latencyMs}ms</span>
+                        </div>
                       </div>
-                      <div className="text-[11px] text-white font-mono mt-1">
-                        Execution Latency: <span className="text-void-gold font-bold">{result.execution.latencyMs}ms</span>
-                      </div>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )
+                })()}
               </div>
             </CardContent>
           </Card>

@@ -59,10 +59,10 @@ export default function ServerDetailPage() {
               <Server className="h-6 w-6 text-void-gold" />
               {server.name}
             </h1>
-            <Badge variant="outline" className={`
-              ${server.status === 'active' ? 'border-void-success text-void-success' : 
-                server.status === 'degraded' ? 'border-void-warning text-void-warning' : 'border-void-error text-void-error'}
-            `}>
+            <Badge variant="outline" className={`capitalize font-mono text-xs px-2.5 py-0.5 rounded-full ${
+              server.status === 'active' ? 'border-void-success/40 text-void-success bg-void-success/10 shadow-[0_0_12px_rgba(74,222,128,0.2)]' : 
+                server.status === 'degraded' ? 'border-void-warning/50 text-void-warning bg-void-warning/15 shadow-[0_0_15px_rgba(245,158,11,0.3)] font-semibold' : 'border-void-error/40 text-void-error bg-void-error/10'
+            }`}>
               {server.status}
             </Badge>
           </div>

@@ -117,9 +117,12 @@ export default function ServersPage() {
                         {server.status === 'degraded' && (
                           <span 
                             title="Simulated demo environment"
-                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono text-void-warning bg-void-warning/10 border border-void-warning/20 cursor-help"
+                            className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-medium text-void-warning bg-void-warning/15 border border-void-warning/40 shadow-[0_0_12px_rgba(245,158,11,0.25)] cursor-help"
                           >
-                            <span className="h-1.5 w-1.5 rounded-full bg-void-warning" />
+                            <span className="relative flex h-2 w-2 items-center justify-center">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-void-warning opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-void-warning"></span>
+                            </span>
                             Degraded
                           </span>
                         )}
