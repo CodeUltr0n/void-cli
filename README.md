@@ -333,9 +333,8 @@ Copyright (c) Void International
 
 ## Contact & Support
 
-- **Email**: [hello@voidinternational.dev](mailto:hello@voidinternational.dev)
+- **Email**: [chokkaraketanrao@gmail.com](mailto:chokkaraketanrao@gmail.com)
 - **GitHub Issues**: [Open an issue](https://github.com/void-international/void/issues) for bug reports and feature requests.
-- **Documentation**: Refer to the [Operations Guide](OPERATIONS_GUIDE.md) and [User Manual](USER_MANUAL.md) for detailed workflows.
 
 ---
 
