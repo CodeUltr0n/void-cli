@@ -14,6 +14,12 @@
 
 [Live Control Plane](https://void-cli.vercel.app) • [Product Overview](https://void-alpha-umber.vercel.app) • [GitHub Repository](https://github.com/void-international/void)
 
+<br/>
+
+[![Watch Void International Product Demo](https://img.shields.io/badge/YouTube-Watch%20Demo%20Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID_HERE)
+
+*(Product demonstration and walkthrough video)*
+
 </div>
 
 ---
@@ -38,48 +44,34 @@ Existing infrastructure solutions fall short because they are protocol-agnostic.
 - **Tool Schema Reflection**: Inspect exposed function signatures, parameter schemas, and cost-per-request configurations for each node.
 - **Cluster Diagnostics**: Detailed telemetry views with latency distribution graphs (p50, p95, p99) and cluster-specific trace histories.
 
-[screenshot: MCP Server Registry table displaying cluster health, region, exposed tools count, and status badges]
-
 ### 2. Intelligent Routing Engine
 - **Multi-Factor Decision Matrix**: Dynamically evaluate candidate clusters using four configurable strategies: *Latency-based*, *Cost-based*, *Error Rate-based*, and *Smart Weighted* scoring.
 - **Interactive Routing Visualizer**: Live visual topology graph illustrating the dynamic request path from client agent through the router engine to the winning cluster.
 - **Transparent Scoring Breakdown**: Full visibility into candidate evaluation scores, normalization math, and decision rationales.
-
-[screenshot: Interactive Routing Visualizer showing animated request flow and scoring breakdown]
 
 ### 3. AI Agent Chat Sandbox
 - **Natural Language Tool Orchestration**: Test end-to-end agent dialogue and automated tool invocation against registered MCP mesh clusters.
 - **Autonomous Tool Selection**: The agent identifies required functions from natural language instructions, generates structured parameter arguments, and dispatches them via Void.
 - **Live Trace Stream**: Real-time execution cards display alongside conversation messages, showcasing latency, winning server attribution, and input/output payloads.
 
-[screenshot: Agent Playground showing split-screen conversation and live execution trace cards]
-
 ### 4. Request Trace Audit Stream
 - **Comprehensive Execution History**: Chronological, immutable audit logging of every tool call dispatched across the network.
 - **Granular Multi-Filter**: Filter traces by execution status (*Success*, *Error*), target server cluster, or specific tool function.
 - **Deep Payload Inspection**: Expandable trace rows displaying complete JSON input arguments, response payloads, duration measurements, and timestamp metadata.
-
-[screenshot: Request Traces audit view with expanded JSON payload inspection drawer]
 
 ### 5. Embedded Developer CLI (`void-cli`)
 - **In-Browser Terminal Emulation**: Integrated xterm.js-powered terminal accessible via keyboard shortcut (`` ` ``), header button, or sidebar.
 - **Operational Command Suite**: Execute commands including `void status`, `void server list`, `void server inspect`, `void route test`, and `void deploy`.
 - **Keyboard-Driven Workflow**: Fast navigation, command autocompletion, and formatted tabular outputs.
 
-[screenshot: Embedded CLI drawer open with server inspection output]
-
 ### 6. Executive Telemetry Dashboard
 - **High-Level KPI Metrics**: Immediate overview of active clusters, 24-hour request volumetrics, aggregate p95 response times, and overall mesh availability.
 - **Time-Series Telemetry Visualizations**: Real-time charts tracking latency percentiles and error rates across rolling operational windows.
 - **Recent Invocations Stream**: Real-time audit feed capturing recent tool dispatches with live latency metrics.
 
-[screenshot: Executive Dashboard overview showing metric cards and time-series telemetry charts]
-
 ### 7. System Architecture Blueprint
 - **Interactive Topology Map**: Visual blueprint mapping the 6 infrastructure layers spanning client connectivity down to execution sandboxes.
 - **Layered Technical Specifications**: In-depth explanations of data plane proxying, multi-factor scoring algorithms, and governance guardrails.
-
-[screenshot: System Architecture page mapping the 6-layer infrastructure stack]
 
 ---
 
@@ -88,7 +80,7 @@ Existing infrastructure solutions fall short because they are protocol-agnostic.
 ```
   ┌─────────────────────────────────────────────────────────────┐
   │                    AI Agent / Client                        │
-  │        (LangChain, LLaMA, OpenAI, Anthropic, Custom)        │
+  │   (LangChain, OpenAI, Anthropic, Custom LLM Runtimes)       │
   └──────────────────────────────┬──────────────────────────────┘
                                  │  MCP Request / Tool Call
                                  ▼
@@ -221,7 +213,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser to access th
 │   │   ├── terminal/        # xterm.js terminal integration and command parser
 │   │   └── ui/              # Base UI design system components
 │   └── lib/                 # Core domain logic, routing algorithms, and data stores
-│       ├── mcp/             # MCP routing engine, scoring formulas, and mock nodes
+│       ├── mcp/             # MCP routing engine, scoring formulas, and cluster node definitions
 │       └── store.ts         # Centralized registry and telemetry state management
 ├── public/                  # Static assets, branding logos, and icons
 ├── void-cli/                # Standalone CLI package distribution
@@ -258,24 +250,24 @@ npx @void/cli <command>
 $ void status
 
 System Status:
-Servers:     3 Healthy | 1 Degraded | 0 Down
-Requests:    520 (last 24h)
-Avg Latency: 142ms (p95)
-Mesh Health: 99.8% Available
+  Servers:     4 Active | 1 Degraded | 0 Offline
+  Requests:    1,247 (last 24h)
+  Avg Latency: 89ms (p95)
+  Mesh Health: 99.6% Available
 ```
 
 #### Example: Simulating a Routing Test
 ```bash
-$ void route test --tool search_hotels --query '{"destination":"Goa"}'
+$ void route test --tool search_inventory --query '{"sku":"A2048"}'
 
-Routing Test Result for tool 'search_hotels':
-Winner: HotelHub Pro
-Reason: Lowest p95 latency (130ms)
+Routing Test Result for tool 'search_inventory':
+  Winner: Inventory-Primary
+  Reason: Lowest p95 latency (67ms)
 
 Scores:
-- HotelHub Pro    : 772 pts (Lowest p95 latency)
-- BookEase Hub    : 598 pts (Active fallback)
-- SkyRoute API    : 312 pts (Degraded latency)
+  Inventory-Primary   : 841 pts (Lowest p95 latency)
+  Inventory-Secondary : 723 pts (Active fallback)
+  Inventory-Staging   : 410 pts (Elevated error rate)
 ```
 
 ---
@@ -297,7 +289,7 @@ Scores:
 ### Phase 3: Enterprise Workspaces & Governance
 - Multi-tenant organization accounts with Role-Based Access Control (RBAC)
 - Fine-grained API key provisioning and per-tool authorization policies
-- Cryptographic request signing and tamper-evident audit logs
+- Request signing and tamper-evident audit logs
 
 ### Phase 4: Mesh Ecosystem & Extensibility
 - MCP Server Registry marketplace for public and private tool discovery
