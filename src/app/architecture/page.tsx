@@ -16,7 +16,7 @@ export default function ArchitecturePage() {
       num: "02",
       title: "Data Plane",
       tech: "Node.js / TypeScript + Redis",
-      desc: "Delivers sub-10ms request routing, token caching, and high-frequency state synchronization for MCP payloads.",
+      desc: "Delivers high-efficiency request routing, token caching, and state synchronization for MCP payloads.",
       icon: Zap,
       implemented: true
     },
@@ -138,14 +138,14 @@ export default function ArchitecturePage() {
         </div>
       </div>
 
-      {/* Enterprise Capabilities Footer */}
+      {/* Architecture Highlights Footer */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/[0.08]">
         <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1.5">
           <div className="text-xs font-semibold text-white flex items-center gap-1.5">
             <Zap className="h-3.5 w-3.5 text-void-gold" />
-            Sub-10ms Latency
+            High-Throughput Proxy
           </div>
-          <p className="text-[11px] text-void-muted">Ultra-fast protocol proxying with intelligent connection pooling.</p>
+          <p className="text-[11px] text-void-muted">Low-overhead protocol proxying with intelligent connection pooling.</p>
         </div>
         <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1.5">
           <div className="text-xs font-semibold text-white flex items-center gap-1.5">
@@ -157,7 +157,7 @@ export default function ArchitecturePage() {
         <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1.5">
           <div className="text-xs font-semibold text-white flex items-center gap-1.5">
             <Shield className="h-3.5 w-3.5 text-void-gold" />
-            SOC2 Compliance
+            Audit & Governance
           </div>
           <p className="text-[11px] text-void-muted">Complete execution audit trails and policy-driven sandbox isolation.</p>
         </div>

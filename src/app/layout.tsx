@@ -18,8 +18,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Void Dashboard",
-  description: "The Infrastructure Layer for MCP",
+  title: "Void International | Infrastructure Layer for MCP",
+  description: "The Infrastructure Layer for Model Context Protocol (MCP)",
 };
 
 import { Sidebar } from "@/components/layout/sidebar";

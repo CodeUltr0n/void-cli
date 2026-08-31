@@ -30,6 +30,9 @@ export default function ServersPage() {
             <span className="text-[10px] font-mono uppercase tracking-widest text-void-gold bg-void-gold/10 px-2 py-0.5 rounded border border-void-gold/20">
               Mesh Nodes
             </span>
+            <span className="text-[10px] font-mono text-void-muted bg-white/[0.04] px-2 py-0.5 rounded border border-white/[0.08]">
+              Simulated Demo Data
+            </span>
           </div>
           <p className="text-xs text-void-muted mt-1">
             Registered Model Context Protocol endpoints, tool schemas, and health metrics.
@@ -112,7 +115,10 @@ export default function ServersPage() {
                           </span>
                         )}
                         {server.status === 'degraded' && (
-                          <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono text-void-warning bg-void-warning/10 border border-void-warning/20">
+                          <span 
+                            title="Simulated demo environment"
+                            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-mono text-void-warning bg-void-warning/10 border border-void-warning/20 cursor-help"
+                          >
                             <span className="h-1.5 w-1.5 rounded-full bg-void-warning" />
                             Degraded
                           </span>
