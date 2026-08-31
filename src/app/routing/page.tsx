@@ -109,19 +109,19 @@ export default function RoutingPage() {
 
                 {/* 3 Target Servers */}
                 <div className="flex justify-between w-full max-w-md gap-3 relative z-10">
-                  {['HotelHub Pro', 'SkyRoute', 'BookEase'].map((name, i) => {
-                    const isWinner = result?.decision?.server?.name === name
+                  {['HotelHub Pro', 'SkyRoute API', 'BookEase Hub'].map((name, i) => {
+                    const isWinner = result?.decision?.server?.name === name || result?.decision?.server?.name?.includes(name.split(' ')[0])
                     return (
                       <div 
                         key={name} 
                         className={`flex-1 bg-[#09090e]/90 border rounded-xl p-3.5 text-center transition-all duration-300 ${
                           isWinner 
-                            ? 'border-void-success bg-void-success/[0.04] shadow-[0_0_20px_rgba(74,222,128,0.2)] scale-105 ring-1 ring-void-success/30' 
+                            ? 'border-void-success bg-void-success/[0.08] shadow-[0_0_25px_rgba(74,222,128,0.3)] scale-105 ring-1 ring-void-success/40' 
                             : 'border-white/[0.06] opacity-60'
                         }`}
                       >
                         <div className="flex justify-center mb-1.5">
-                          <Server className={`h-4 w-4 ${isWinner ? 'text-void-success drop-shadow-[0_0_6px_rgba(74,222,128,0.6)]' : 'text-void-muted'}`} />
+                          <Server className={`h-4 w-4 ${isWinner ? 'text-void-success drop-shadow-[0_0_8px_rgba(74,222,128,0.8)]' : 'text-void-muted'}`} />
                         </div>
                         <div className="font-semibold text-white text-xs truncate">{name}</div>
                         <div className="flex items-center justify-center gap-1.5 mt-1.5">
