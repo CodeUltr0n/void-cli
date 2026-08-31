@@ -44,6 +44,8 @@ export default function DashboardPage() {
                 alt="Void Black Hole Logo" 
                 width={80} 
                 height={80} 
+                priority
+                loading="eager"
                 style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
                 className="object-contain drop-shadow-[0_0_12px_rgba(201,168,76,0.6)] animate-subtle-pulse" 
               />

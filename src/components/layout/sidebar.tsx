@@ -36,6 +36,8 @@ export function Sidebar() {
               alt="Void Logo" 
               width={32} 
               height={32} 
+              priority
+              loading="eager"
               style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
               className="relative z-10 object-contain drop-shadow-[0_0_8px_rgba(201,168,76,0.5)] transition-transform duration-300 group-hover:scale-110" 
             />

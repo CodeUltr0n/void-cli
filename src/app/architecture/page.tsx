@@ -65,6 +65,8 @@ export default function ArchitecturePage() {
               alt="Void Logo" 
               width={56} 
               height={56} 
+              priority
+              loading="eager"
               style={{ width: 'auto', height: 'auto', maxWidth: '100%', maxHeight: '100%' }}
               className="object-contain drop-shadow-[0_0_10px_rgba(201,168,76,0.6)]" 
             />
