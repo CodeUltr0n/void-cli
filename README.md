@@ -1,8 +1,6 @@
 <div align="center">
 
-<img src="./public/void-logo.png" alt="Void International Logo" width="96" />
-
-# Void International
+# <img src="./public/void-logo.png" alt="Void Logo" width="38" style="vertical-align: middle; margin-right: 8px;" /> Void International
 
 ### The Infrastructure Layer for Model Context Protocol (MCP)
 
