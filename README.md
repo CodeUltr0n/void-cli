@@ -12,11 +12,11 @@
 
 **Intelligent multi-cluster routing, real-time telemetry, and operational infrastructure for autonomous AI agent tool execution.**
 
-[Live Control Plane](https://void-cli.vercel.app) • [Product Overview](https://void-alpha-umber.vercel.app) • [GitHub Repository](https://github.com/void-international/void)
+[Live Control Plane](https://void-cli.vercel.app) • [Product Overview](https://void-alpha-umber.vercel.app)
 
 <br/>
 
-[![Watch Void International Product Demo](https://img.shields.io/badge/YouTube-Watch%20Demo%20Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=YOUR_VIDEO_ID_HERE)
+[![Watch Void International Product Demo](https://img.shields.io/badge/YouTube-Watch%20Demo%20Video-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=V84lXnS-ows)
 
 *(Product demonstration and walkthrough video)*
 
